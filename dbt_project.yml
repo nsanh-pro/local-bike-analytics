@@ -39,6 +39,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 
 models:
+  +persist_docs:
+    relation: true   # write table/view description
+    columns: true    # write column descriptions
   local_bike_analytics:  # This is the name of your project
     # Applies to all files under models/example/
     staging:
@@ -47,7 +50,7 @@ models:
         +schema: stg_local_bike_operational_database
 
     intermediate:
-      +materialized: view
+      +materialized: table
       local_bike: 
         +schema: int_local_bike  
     marts:
