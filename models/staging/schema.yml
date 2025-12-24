@@ -1,0 +1,155 @@
+version: 2
+
+models:
+  - name: stg_local_bike_operational_database__brands
+    description: "This model contains information about brands."
+    columns:
+      - name: brand_id
+        description: "Primary key, unique identifier for each brand."
+        tests:
+            - unique
+            - not_null
+      - name: brand_name
+        description: "Name of the brand"
+  - name: stg_local_bike_operational_database__categories
+    description: "This model contains information about product categories."
+    columns:
+      - name: category_id
+        description: "Primary key, unique identifier for each product category."
+        tests:
+            - unique
+            - not_null
+  - name: stg_local_bike_operational_database__customers
+    description: "This model contains information about customers."
+    columns:
+      - name: customer_id
+        description: "Primary key, unique identifier for each customer."
+        tests:
+            - unique
+            - not_null
+  - name: stg_local_bike_operational_database__order_items
+    description: "This model contains information about each item included in an order, including its unit price, quantity and discount."
+    columns:
+      - name: order_item_id
+        description: "Primary key, unique identifier for each order item. "
+        tests:
+            - unique
+            - not_null
+      - name: order_id
+        description: "Foreign key linking the order item to the corresponding order."
+        tests:
+          - relationships:
+              name: order_id_foreign_key_in_stg_local_bike_operational_database__order_item
+              arguments:
+                to: ref('stg_local_bike_operational_database__orders')
+                field: order_id
+      - name: product_id
+        description: "Foreign key linking the order item to the corresponding product."
+        tests:
+          - relationships:
+              name: product_id_foreign_key_in_stg_local_bike_operational_database__order_item
+              arguments:
+                to: ref('stg_local_bike_operational_database__products')
+                field: product_id
+  - name: stg_local_bike_operational_database__orders
+    description: "This model contains information about orders placed by customers, including the order status, the store where the order has been made and the staff who took care of the order."
+    columns:
+      - name: order_id
+        description: "Primary key, unique identifier for each order."
+        tests:
+            - unique
+            - not_null
+      # - name: order_status
+      #   description: "Foreign key to status table." # No status table at the moment
+      #   tests:
+      #     - not null
+      #     - relationships:
+      #         name: user_id_foreign_key_in_stg_local_bike_operational_database__orders
+      #         arguments:
+      #           to: ref('stg_local_bike_operational_database__customers')
+      #           field: customer_id
+      - name: customer_id
+        description: "Foreign key linking the order to the customer who placed it."
+        tests:
+          - relationships:
+              name: customer_id_foreign_key_in_stg_local_bike_operational_database__orders
+              arguments:
+                to: ref('stg_local_bike_operational_database__customers')
+                field: customer_id
+      - name: store_id
+        description: "Foreign key linking the order to the customer who placed it."
+        tests:
+          - relationships:
+              name: store_id_foreign_key_in_stg_local_bike_operational_database__orders
+              arguments:
+                to: ref('stg_local_bike_operational_database__stores')
+                field: store_id
+      - name: staff_id
+        description: "Foreign key linking the order to the customer who placed it."
+        tests:
+          - relationships:
+              name: staff_id_foreign_key_in_stg_local_bike_operational_database__orders
+              arguments:
+                to: ref('stg_local_bike_operational_database__staffs')
+                field: staff_id
+  - name: stg_local_bike_operational_database__products
+    description: "This model contains information about products."
+    columns:
+      - name: product_id
+        description: "Primary key, unique identifier for each product."
+        tests:
+            - unique
+            - not_null
+  - name: stg_local_bike_operational_database__staffs
+    description: "This model contains information about staff members."
+    columns:
+      - name: staff_id
+        description: "Primary key, unique identifier for each staff member."
+        tests:
+            - unique
+            - not_null
+      - name: manager_id
+        description: "Foreign key pointing to the staff member's manager."
+        # tests:
+        #   - relationships: # Problem : how to handle staff without manager ?
+        #       name: manager_id_foreign_key_in_stg_local_bike_operational_database__staffs
+        #       arguments:
+        #         to: ref('stg_local_bike_operational_database__staffs')
+        #         field: staff_id
+      - name: store_id
+        description: "Foreign key pointing to the staff member's store."
+        tests:
+          - relationships:
+              name: store_id_foreign_key_in_stg_local_bike_operational_database__staffs
+              arguments:
+                to: ref('stg_local_bike_operational_database__stores')
+                field: store_id
+  - name: stg_local_bike_operational_database__stocks
+    description: "This model contains information about stocks per product per store."
+    columns:
+      - name: store_id
+        description: "Foreign key to the store table."
+        tests:
+          - relationships:
+              name: store_id_foreign_key_in_stg_local_bike_operational_database__stocks
+              arguments:
+                to: ref('stg_local_bike_operational_database__stores')
+                field: store_id
+      - name: product_id
+        description: "Foreign key to the product table."
+        tests:
+          - relationships:
+              name: product_id_foreign_key_in_stg_local_bike_operational_database__stocks
+              arguments:
+                to: ref('stg_local_bike_operational_database__products')
+                field: product_id
+      - name: quantity
+        description: "Quantity of a given product for a given store."
+  - name: stg_local_bike_operational_database__stores
+    description: "This model contains information about stores."
+    columns:
+      - name: store_id
+        description: "Primary key, unique identifier for each store."
+        tests:
+            - unique
+            - not_null
