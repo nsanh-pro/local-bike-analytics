@@ -51,6 +51,8 @@ models:
               arguments:
                 to: ref('stg_local_bike_operational_database__products')
                 field: product_id
+      # - name: total_order_item_amount
+      #   description: "Total order item amount calculated with quantity * list_price with applied discount."
   - name: stg_local_bike_operational_database__orders
     description: "This model contains information about orders placed by customers, including the order status, the store where the order has been made and the staff who took care of the order."
     columns:

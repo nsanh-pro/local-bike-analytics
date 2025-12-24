@@ -14,7 +14,7 @@ renamed as (
         quantity,
         list_price,
         discount
-
+        
     from source
 
 )
