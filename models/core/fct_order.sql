@@ -7,6 +7,10 @@ WITH
             store_id,
             staff_id,
             order_status,
+            CASE 
+                WHEN COALESCE(shipped_date, DATE(CURRENT_DATE())) <= required_date THEN FALSE
+                ELSE TRUE
+            END AS is_shipped_late,
             {{ as_date_key('order_date') }} as order_date_key,
             {{ as_date_key('required_date') }} as required_date_key,
             {{ as_date_key('shipped_date') }} as shipped_date_key
@@ -35,10 +39,14 @@ WITH
             o.order_date_key,
             o.required_date_key,
             o.shipped_date_key,
+            o.is_shipped_late,
+            CASE 
+                WHEN o.is_shipped_late THEN o.shipped_date_key - o.required_date_key
+            END AS number_of_days_late_shipping,
             oi.total_quantity,
-            oi.total_gross_amount,
-            oi.total_discount_amount,
-            oi.total_net_amount
+            ROUND(oi.total_gross_amount, 2) AS total_gross_amount,
+            ROUND(oi.total_discount_amount, 2) AS total_discount_amount,
+            ROUND(oi.total_net_amount, 2) AS total_net_amount
         FROM orders o
         LEFT JOIN orders_items_agg_per_order oi ON o.order_id = oi.order_id
     )
