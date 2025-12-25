@@ -20,7 +20,7 @@ WITH
             SUM(gross_amount) AS total_gross_amount,
             SUM(discount_amount) AS total_discount_amount,
             SUM(net_amount) AS total_net_amount
-        FROM {{ ref('int_fct_order_item' )}} 
+        FROM {{ ref('fct_order_item' )}} 
         GROUP BY
             order_id
     ),
