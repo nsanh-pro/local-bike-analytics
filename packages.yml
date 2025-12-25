@@ -1,3 +1,5 @@
 packages:
   - package: dbt-labs/codegen
     version: 0.14.0  # Use latest from hub.getdbt.com/dbt-labs/codegen/latest/[web:35]
+  - package: dbt-labs/dbt_utils
+    version: [">=1.1.0", "<2.0.0"]
