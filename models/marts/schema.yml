@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: mrt_top_100_customers
+    description: "This model contains information about top 100 customers by gross amount sold."
+    columns:
+      - name: preferred_store
+        description: "Preferred store of the customer, based on the net amount spent."
