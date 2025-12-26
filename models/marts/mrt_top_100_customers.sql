@@ -3,8 +3,8 @@ WITH
     (
         SELECT
             f.customer_id,
-            ROUND(SUM(f.total_gross_amount), 2) as total_gross_amount,
-            ROUND(SUM(f.total_net_amount), 2) as total_net_amount,
+            ROUND(SUM(f.total_gross_sales_amount), 2) as total_gross_sales_amount,
+            ROUND(SUM(f.total_net_sales_amount), 2) as total_net_sales_amount,
             ROUND(SUM(f.total_quantity), 2) AS total_quantity,
             COUNT(1) AS total_orders,
             MAX(order_date.date_day) AS last_order_date,

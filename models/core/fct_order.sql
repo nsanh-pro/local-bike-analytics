@@ -21,9 +21,9 @@ WITH
         SELECT 
             order_id,
             SUM(quantity) AS total_quantity,
-            SUM(gross_amount) AS total_gross_amount,
+            SUM(gross_amount) AS total_gross_sales_amount,
             SUM(discount_amount) AS total_discount_amount,
-            SUM(net_amount) AS total_net_amount
+            SUM(net_amount) AS total_net_sales_amount
         FROM {{ ref('fct_order_item' )}} 
         GROUP BY
             order_id
