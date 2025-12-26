@@ -6,7 +6,10 @@ WITH
     ),
     final AS 
     (
-        SELECT *
+        SELECT
+            *,
+            first_name || ' ' || last_name AS full_name,
+            street || ' ' || city || ' ' || state || ' ' || zip_code AS full_address
         FROM stg_customers
     )
 SELECT *
