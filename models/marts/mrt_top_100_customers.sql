@@ -13,7 +13,7 @@ WITH
         INNER JOIN {{ ref('dim_date') }} AS order_date ON f.order_date_key = order_date.date_key
         GROUP BY
             f.customer_id
-        ORDER BY total_gross_amount DESC
+        ORDER BY total_gross_sales_amount DESC
         LIMIT 100
     ),
     preferred_store_per_customer AS 
@@ -27,7 +27,7 @@ WITH
         GROUP BY
             customer.customer_id,
             store.store_name
-        QUALIFY ROW_NUMBER() OVER (PARTITION BY customer.customer_id, store.store_name ORDER BY SUM(orders.total_net_amount) DESC) = 1
+        QUALIFY ROW_NUMBER() OVER (PARTITION BY customer.customer_id, store.store_name ORDER BY SUM(orders.total_net_sales_amount) DESC) = 1
     ),
     final AS 
     (

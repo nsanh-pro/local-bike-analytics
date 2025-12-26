@@ -41,9 +41,9 @@ WITH
             orders.total_orders,
             orders.total_late_shippings,
             orders.total_quantity,
-            orders.total_gross_amount,
+            orders.total_gross_sales_amount,
             orders.total_discount_amount,
-            orders.total_net_amount
+            orders.total_net_sales_amount
         FROM staff
         LEFT JOIN monthly_orders_per_staff orders ON staff.staff_id = orders.staff_id
     )
