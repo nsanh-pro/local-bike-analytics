@@ -36,11 +36,12 @@ Materialization type: views.
 ### Core / Silver Layer
 From Bronze models using `{{ ref() }}` jinjas, create silver models with the following transformations:
 - Adding common business rules and calculations
-- Star schema modeling with dimension and fact tables:
+- For the purpose of this exercice: star schema modeling with dimension and fact tables:
   - A Date dimension has been generated using the `dbt_utils` package.
   - Date surrogate keys have been created in fact tables using _dbt macros_, stored in the `\macros` folder
+- In a real world scenario, I would have created an intermediate layer between staging and this star schema. The aim of this intermediate layer would be to expose an object oriented modelization, with normalized / snowflake models. This would be especially relevant for companies having several CRMs or ERPs dealing with the same business entities / objects, but with heterogeneous modelizations depending on their underlying source application and/or different referential data. This layer would be the place where I would merge those datas into some mutualized data models before serving them in a star schema model. 
 
-These models are meant to be used as source for Silver models.
+These models are meant to be used as source for Gold models.
 Materialization type: tables (as they would be often queried).
 
 Note: This layer has been used to create a Power BI semantic model, which can be seen as a Gold Layer itself.
