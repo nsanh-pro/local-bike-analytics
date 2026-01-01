@@ -57,7 +57,7 @@ From Silver models using `{{ ref() }}` jinjas, create gold models with the follo
 - Specific calculations and KPIs
 
 These gold models are supposed to be directly used by end users, without the need for them to handle relationships.
-Materializtion type: tables (as they would be often queried).
+Materialization type: tables (as they would be often queried).
 
 In the following capture, we can see that the `mrt_top_100_customer` is used. The end user only has to do some drag and drop to create its report.
 
