@@ -1,8 +1,120 @@
 version: 2
 
 models:
-  - name: mrt_top_100_customers
-    description: "This model contains information about top 100 customers by gross amount sold."
+  - name: mrt_sales_staff_performance
+    description: "Monthly staff performance metrics scoped by store and manager. Useful for evaluating individual and store-level operational KPIs such as orders processed, late shipments, units sold and sales amounts."
     columns:
+      - name: staff_full_name
+        data_type: string
+        description: "Concatenated full name of the staff member (e.g., 'Jane Doe'). Used as the primary display identifier for the employee."
+
+      - name: store_name
+        data_type: string
+        description: "Denormalized store name where the staff member is assigned or where the orders were processed."
+
+      - name: manager_full_name
+        data_type: string
+        description: "Concatenated full name of the staff member's direct manager (nullable if no manager)."
+
+      - name: year
+        data_type: int64
+        description: "Calendar year for the aggregation (e.g., 2024)."
+
+      - name: month
+        data_type: int64
+        description: "Numeric month for the aggregation (1-12)."
+
+      - name: month_name
+        data_type: string
+        description: "Human-readable month name for the aggregation period (e.g., 'January')."
+
+      - name: total_orders
+        data_type: int64
+        description: "Count of distinct orders attributed to the staff member during the period."
+
+      - name: total_late_shippings
+        data_type: int64
+        description: "Count of orders attributed to the staff member that were shipped after the required delivery date."
+
+      - name: total_quantity
+        data_type: int64
+        description: "Total units sold in orders attributed to the staff member during the period."
+
+      - name: total_gross_sales_amount
+        data_type: float64
+        description: "Sum of gross sales amounts (before discounts) from orders attributed to the staff member (monetary)."
+
+      - name: total_discount_amount
+        data_type: float64
+        description: "Sum of discounts applied to orders attributed to the staff member (monetary)."
+
+      - name: total_net_sales_amount
+        data_type: float64
+        description: "Net sales for the staff member after discounts (total_gross_sales_amount - total_discount_amount)."
+
+  - name: mrt_top_100_customers
+    description: "Top 100 customers by sales (configurable ranking window). Includes contact details, ordering summary and preferred store to support retention and marketing analysis."
+    columns:
+      - name: full_name
+        data_type: string
+        description: "Customer full name (first + last) for display and reporting."
+
+      - name: full_address
+        data_type: string
+        description: "Preformatted full postal address for the customer (street, city, state, zip)."
+
+      - name: phone
+        data_type: string
+        description: "Primary contact phone number for the customer (nullable)."
+
+      - name: email
+        data_type: string
+        description: "Customer email address used for contact and marketing."
+
+      - name: street
+        data_type: string
+        description: "Street address line for the customer's primary address."
+
+      - name: city
+        data_type: string
+        description: "City portion of the customer's address."
+
+      - name: state
+        data_type: string
+        description: "State or region portion of the customer's address."
+
+      - name: zip_code
+        data_type: int64
+        description: "Postal / ZIP code for the customer's address."
+
+      - name: customer_id
+        data_type: int64
+        description: "Surrogate or source customer identifier used to join back to customer dimension and source records."
+
+      - name: total_gross_sales_amount
+        data_type: float64
+        description: "Aggregate gross sales for the customer over the ranking period (monetary)."
+
+      - name: total_net_sales_amount
+        data_type: float64
+        description: "Aggregate net sales after discounts/returns for the customer over the ranking period (monetary)."
+
+      - name: total_quantity
+        data_type: float64
+        description: "Total units purchased by the customer over the ranking period."
+
+      - name: total_orders
+        data_type: int64
+        description: "Count of distinct orders placed by the customer during the ranking period."
+
+      - name: last_order_date
+        data_type: date
+        description: "Date of the customer's most recent order (nullable if no orders in period)."
+
+      - name: total_stores_ordered
+        data_type: int64
+        description: "Number of distinct stores the customer has placed orders with (indicates breadth of engagement)."
+
       - name: preferred_store
-        description: "Preferred store of the customer, based on the net amount spent."
+        data_type: string
+        description: "Denormalized store name where the customer spent the most (highest revenue) during the ranking period."
