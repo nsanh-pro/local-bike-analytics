@@ -1,0 +1,259 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Calendar/date dimension for joining facts to time and for time-based aggregations."
+    columns:
+      - name: date_key
+        data_type: int64
+        description: "Surrogate integer key for the date (commonly YYYYMMDD). Primary join key to fact tables."
+      - name: date_day
+        data_type: date
+        description: "Date value (date type) representing the calendar day."
+      - name: year
+        data_type: int64
+        description: "Calendar year extracted from date_day (e.g., 2024)."
+      - name: quarter
+        data_type: int64
+        description: "Quarter of the year (1-4) derived from date_day."
+      - name: month
+        data_type: int64
+        description: "Month number (1-12) derived from date_day."
+      - name: year_month
+        data_type: string
+        description: "Year-month string in YYYY-MM format for easy monthly grouping."
+      - name: day_of_month
+        data_type: int64
+        description: "Day of month (1-31) extracted from date_day."
+      - name: day_of_week
+        data_type: int64
+        description: "Numeric day of week (1=Monday .. 7=Sunday) derived from date_day."
+      - name: day_name
+        data_type: string
+        description: "Full day name (e.g., 'Monday') derived from date_day."
+      - name: month_name
+        data_type: string
+        description: "Full month name (e.g., 'January') derived from date_day."
+      - name: is_weekend
+        data_type: boolean
+        description: "Boolean flag indicating whether date_day falls on a weekend."
+
+  - name: dim_customer
+    description: "Customer dimension with canonical customer attributes and derived address/name fields."
+    columns:
+      - name: customer_id
+        data_type: int64
+        description: "Surrogate primary key for the customer (matches source customer id)."
+      - name: first_name
+        data_type: string
+        description: "Customer given/first name."
+      - name: last_name
+        data_type: string
+        description: "Customer family/last name."
+      - name: phone
+        data_type: string
+        description: "Primary phone number for the customer (nullable)."
+      - name: email
+        data_type: string
+        description: "Customer email address used for communications and identifiers."
+      - name: street
+        data_type: string
+        description: "Street address line for the customer's primary address."
+      - name: city
+        data_type: string
+        description: "City portion of the customer's address."
+      - name: state
+        data_type: string
+        description: "State/region portion of the customer's address."
+      - name: zip_code
+        data_type: int64
+        description: "Postal/ZIP code for the customer's address."
+      - name: full_name
+        data_type: string
+        description: "Precomputed concatenation of first_name and last_name for display and joins."
+      - name: full_address
+        data_type: string
+        description: "Precomputed concatenation of street, city, state and zip for reporting."
+
+  - name: dim_product
+    description: "Product/master dimension containing product identifiers and descriptive attributes."
+    columns:
+      - name: product_id
+        data_type: int64
+        description: "Surrogate primary key for the product (SKU or internal id)."
+      - name: product_name
+        data_type: string
+        description: "Human-readable product name or title."
+      - name: brand_name
+        data_type: string
+        description: "Brand name associated with the product."
+      - name: category_name
+        data_type: string
+        description: "Category or type of the product (e.g., Road, Mountain, Accessories)."
+      - name: model_year
+        data_type: int64
+        description: "Model or release year for the product (numeric)."
+      - name: list_price
+        data_type: float64
+        description: "Suggested retail/list price for the product (monetary)."
+
+  - name: dim_staff
+    description: "Staff/employee dimension used to attribute sales and operations activity to employees."
+    columns:
+      - name: staff_id
+        data_type: int64
+        description: "Surrogate primary key for the staff member (employee id)."
+      - name: first_name
+        data_type: string
+        description: "Staff member's given/first name."
+      - name: last_name
+        data_type: string
+        description: "Staff member's family/last name."
+      - name: email
+        data_type: string
+        description: "Work email address for the staff member."
+      - name: phone
+        data_type: string
+        description: "Contact phone number for the staff member (nullable)."
+      - name: active
+        data_type: int64
+        description: "Active flag (e.g., 1 = active, 0 = inactive) indicating current employment status."
+      - name: store_id
+        data_type: int64
+        description: "Foreign key to dim_store representing the staff member's assigned location."
+      - name: manager_id
+        data_type: int64
+        description: "Nullable foreign key pointing to another staff_id who is the direct manager."
+      - name: full_name
+        data_type: string
+        description: "Precomputed full name (first_name + last_name) for display and joins."
+      - name: store_name
+        data_type: string
+        description: "Denormalized store name for convenience when joining staff to store info."
+      - name: manager_full_name
+        data_type: string
+        description: "Denormalized full name of the manager (nullable)."
+
+  - name: dim_store
+    description: "Store/location dimension with contact and address details for each retail location."
+    columns:
+      - name: store_id
+        data_type: int64
+        description: "Surrogate primary key for the store/location."
+      - name: store_name
+        data_type: string
+        description: "Official store or location name."
+      - name: phone
+        data_type: string
+        description: "Primary store phone number."
+      - name: email
+        data_type: string
+        description: "Primary store email address for contact."
+      - name: street
+        data_type: string
+        description: "Street address of the store."
+      - name: city
+        data_type: string
+        description: "City where the store is located."
+      - name: state
+        data_type: string
+        description: "State/region where the store is located."
+      - name: zip_code
+        data_type: int64
+        description: "Postal/ZIP code for the store address."
+
+  - name: fct_order_item
+    description: "Order line-level fact with one row per product sold on an order including pricing and computed amounts."
+    columns:
+      - name: order_item_id
+        data_type: string
+        description: "Unique identifier for the order line (string where present)."
+      - name: order_id
+        data_type: int64
+        description: "Foreign key to fct_order representing the parent order."
+      - name: item_id
+        data_type: int64
+        description: "Source line number or item sequence identifier within the order."
+      - name: product_id
+        data_type: int64
+        description: "Foreign key to dim_product for the sold product."
+      - name: quantity
+        data_type: int64
+        description: "Quantity of the product sold on this line (integer)."
+      - name: list_price
+        data_type: float64
+        description: "Unit list price of the product at time of sale (monetary)."
+      - name: discount
+        data_type: float64
+        description: "Discount applied to the line (monetary or percent depending on pipeline convention)."
+      - name: gross_sales_amount
+        data_type: float64
+        description: "Gross amount before discounts (quantity * list_price)."
+      - name: discount_amount
+        data_type: float64
+        description: "Monetary value of discounts applied to this line."
+      - name: net_sales_amount
+        data_type: float64
+        description: "Net amount after discounts (gross_sales_amount - discount_amount)."
+
+  - name: fct_order
+    description: "Order-level fact with aggregated order metrics and shipping/timing flags."
+    columns:
+      - name: order_id
+        data_type: int64
+        description: "Surrogate primary key for the order (matches source order id)."
+      - name: customer_id
+        data_type: int64
+        description: "Foreign key to dim_customer identifying the buyer."
+      - name: store_id
+        data_type: int64
+        description: "Foreign key to dim_store identifying the fulfilling location."
+      - name: staff_id
+        data_type: int64
+        description: "Foreign key to dim_staff for the staff who processed the order (nullable)."
+      - name: order_status
+        data_type: int64
+        description: "Order status code (map to business status values in documentation)."
+      - name: order_date_key
+        data_type: int64
+        description: "FK to dim_date.date_key representing the order creation date."
+      - name: required_date_key
+        data_type: int64
+        description: "FK to dim_date.date_key representing requested/required delivery date (nullable)."
+      - name: shipped_date_key
+        data_type: int64
+        description: "FK to dim_date.date_key representing the actual shipped date (nullable)."
+      - name: is_shipped_late
+        data_type: boolean
+        description: "Boolean flag indicating whether shipped_date_key is after required_date_key."
+      - name: number_of_days_late_shipping
+        data_type: int64
+        description: "Integer number of days shipment was late (nullable; 0 or null when on-time)."
+      - name: total_quantity
+        data_type: int64
+        description: "Total quantity of items across all lines for the order."
+      - name: total_gross_sales_amount
+        data_type: float64
+        description: "Sum of gross_sales_amount from order lines (monetary)."
+      - name: total_discount_amount
+        data_type: float64
+        description: "Sum of discount_amount from order lines (monetary)."
+      - name: total_net_sales_amount
+        data_type: float64
+        description: "Final order total after discounts (monetary)."
+
+  - name: fct_stock
+    description: "Current stock fact capturing on-hand quantities and value per store/product."
+    columns:
+      - name: store_id
+        data_type: int64
+        description: "Foreign key to dim_store for the location holding the stock."
+      - name: product_id
+        data_type: int64
+        description: "Foreign key to dim_product for the inventory item."
+      - name: quantity
+        data_type: int64
+        description: "Quantity on hand at the snapshot time (integer)."
+      - name: stock_value
+        data_type: float64
+        description: "Monetary value of the on-hand stock (quantity * unit cost or list_price depending on pipeline)."
